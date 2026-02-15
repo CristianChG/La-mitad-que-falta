@@ -45,10 +45,29 @@ ExportedObj/
 *.sln
 *.suo
 *.tmp
+=======
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+[Mm]emoryCaptures/
+
+.vs/
+.idea/
+.gradle/
+
+*.csproj
+*.sln
+>>>>>>> a074f00 (Initial Unity project)
 *.user
 *.userprefs
 *.pidb
 *.booproj
+<<<<<<< HEAD
 *.svd
 *.pdb
 *.mdb
@@ -97,3 +116,9 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+=======
+
+.DS_Store
+Thumbs.db
+
+>>>>>>> a074f00 (Initial Unity project)
