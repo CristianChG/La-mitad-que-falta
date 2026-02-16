@@ -1,41 +1,93 @@
 using UnityEngine;
+using System.Collections;
+using TMPro;
+using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Collider2D))]
 public class DialogueTrigger : MonoBehaviour
 {
-    public DialogueController dialogueController;
-    public DialogueLine[] lines;
-    public KeyCode interactKey = KeyCode.E;
+    [SerializeField] private GameObject dialogueMarker;
+    [SerializeField] private GameObject dialoguePanel;
+    [SerializeField] private TMP_Text dialogueText;
+    [SerializeField, TextArea(4, 6)] private string[] dialogueLines; 
 
-    private bool playerInRange;
+    private bool isPlayerInRange;
+    private bool didStartDialogue;
+    private int lineIndex;
+    private float typewriterSpeed = 0.02f;
+    
 
     void Update()
     {
-        if (!playerInRange || dialogueController == null)
+        var keyboard = Keyboard.current;
+        if (isPlayerInRange && keyboard != null && keyboard.eKey.wasPressedThisFrame)
         {
-            return;
-        }
-
-        if (Input.GetKeyDown(interactKey))
-        {
-            dialogueController.lines = lines;
-            dialogueController.StartDialogue();
+            if (!didStartDialogue)
+            {
+                StartDialogue();
+            }
+            else if (dialogueText.text == dialogueLines[lineIndex])
+            {
+                AdvancedeDialogue();
+            }
+            else
+            {
+                StopAllCoroutines();
+                dialogueText.text = dialogueLines[lineIndex];
+            }
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
+    private void StartDialogue()
     {
-        if (other.CompareTag("Player"))
+        didStartDialogue = true;
+        dialogueMarker.SetActive(false);
+        dialoguePanel.SetActive(true);
+        lineIndex = 0;
+        Time.timeScale = 0f;
+        StartCoroutine(ShowDialogue());
+    }
+
+    private void AdvancedeDialogue()
+    {
+        if (lineIndex < dialogueLines.Length - 1)
         {
-            playerInRange = true;
+            lineIndex++;
+            StartCoroutine(ShowDialogue());
+        }
+        else
+        {
+            didStartDialogue = false;
+            dialoguePanel.SetActive(false);
+            dialogueMarker.SetActive(true);
+            Time.timeScale = 1f;
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    private IEnumerator ShowDialogue()
     {
-        if (other.CompareTag("Player"))
+        dialogueText.text = string.Empty;
+        foreach (char letter in dialogueLines[lineIndex].ToCharArray())
         {
-            playerInRange = false;
+            dialogueText.text += letter;
+            yield return new WaitForSecondsRealtime(typewriterSpeed);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            isPlayerInRange = true;
+            dialogueMarker.SetActive(true);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))        
+        {
+            isPlayerInRange = false;
+            dialogueMarker.SetActive(false);
         }
     }
 }
